@@ -110,3 +110,7 @@ data-*/
 .vscode 
 
 package-lock.json
+
+# credential files 
+src/key.json
+.creds
