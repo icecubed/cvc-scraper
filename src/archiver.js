@@ -77,7 +77,7 @@ async function getFullDump(locations) {
             id: district.id,
             name: district.name,
             //cvcs: augmentedCVCs,
-            cvcs: cvcs,
+            cvcs: cvcs.rawData,
           };
         },
         { concurrency: 4 }
