@@ -54,6 +54,7 @@ async function getFullDump(locations) {
       };
 
       vaccinationsData.states[state.name] = { ...slotsData.states[state.name] };
+      vaccinationsData.states[state.name].districts = {};
 
       await pMap(
         state.districts,
@@ -77,7 +78,7 @@ async function getFullDump(locations) {
             id: district.id,
             name: district.name,
             //cvcs: augmentedCVCs,
-            cvcs: cvcs.rawData,
+            cvcs: cvcs.map((x) => x.rawData),
           };
         },
         { concurrency: CONCURRENT_DISTRICTS }
