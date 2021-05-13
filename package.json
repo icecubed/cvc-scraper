@@ -14,6 +14,7 @@
     "start": "node cvc.js",
     "full-cycle": "npm run clean && node scrape.js && npm run zip-data",
     "cron": "node bin/cron.js",
+    "archive":"node src/archiver.js",
     "clean-csv": "rm data-raw/csv/*.csv || true",
     "clean-json": "rm data-raw/json/district*.json data-raw/json/allStates*.json || true",
     "clean": "npm run clean-csv && npm run clean-json",
