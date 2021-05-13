@@ -6,7 +6,8 @@ const { transform } = require("../lib/transformer");
 const pMap = require("p-map");
 const fs = require("fs");
 const path = require("path");
-const CONCURRENT_STATES = 2;
+const CONCURRENT_STATES = 5;
+const CONCURRENT_DISTRICTS = 5;
 const AWS = require("aws-sdk");
 
 async function publishS3(bucketName, key, body) {
@@ -71,28 +72,12 @@ async function getFullDump(locations) {
           console.log(
             `Found ${cvcs.length} current vaccination sites in ${state.name} -> ${district.name}`
           );
-          const augmentedCVCs = await pMap(
-            cvcs,
-            async (cvc) => {
-              const rawData = cvc.rawData;
-              if (locations[cvc.name.toLowerCase()]) {
-                rawData.address = locations[cvc.name.toLowerCase()];
-                console.log(
-                  `Found local location for ${state.name} -> ${district.name} -> ${cvc.name}`
-                );
-              } else {
-                console.log(
-                  `Did not find location for ${state.name} -> ${district.name} -> ${cvc.name}`
-                );
-              }
-              return rawData;
-            },
-            { concurency: 4 }
-          );
+          //const augmentedCVCs = await augmentCVCLocations(cvcs, locations, state, district);
           vaccinationsData.states[state.name].districts[district.name] = {
             id: district.id,
             name: district.name,
-            cvcs: augmentedCVCs,
+            //cvcs: augmentedCVCs,
+            cvcs: cvcs,
           };
         },
         { concurrency: 4 }
@@ -106,11 +91,32 @@ async function getFullDump(locations) {
     vaccinations: vaccinationsData,
   };
 }
-async function main() {
-  const isroLocations = await getIsroCSVLocations(
-    `${__dirname}/../data/isro.csv`
+async function augmentCVCLocations(cvcs, locations, state, district) {
+  return await pMap(
+    cvcs,
+    async (cvc) => {
+      const rawData = cvc.rawData;
+      if (locations[cvc.name.toLowerCase()]) {
+        rawData.address = locations[cvc.name.toLowerCase()];
+        console.log(
+          `Found local location for ${state.name} -> ${district.name} -> ${cvc.name}`
+        );
+      } else {
+        console.log(
+          `Did not find location for ${state.name} -> ${district.name} -> ${cvc.name}`
+        );
+      }
+      return rawData;
+    },
+    { concurency: 4 }
   );
-  const dump = await getFullDump(isroLocations);
+}
+
+async function main() {
+  // const isroLocations = await getIsroCSVLocations(
+  //   `${__dirname}/../data/isro.csv`
+  // );
+  const dump = await getFullDump(/*isroLocations*/);
   for (const key of Object.keys(dump)) {
     const filename = path.join(
       "raw",
