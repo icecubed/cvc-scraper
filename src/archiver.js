@@ -80,7 +80,7 @@ async function getFullDump(locations) {
             cvcs: cvcs.rawData,
           };
         },
-        { concurrency: 4 }
+        { concurrency: CONCURRENT_DISTRICTS }
       );
     },
     { concurrency: CONCURRENT_STATES }
@@ -132,8 +132,8 @@ async function main() {
       zlib.gzipSync(JSON.stringify(dump[key]))
     );
     // Publish to Git
-    fs.mkdirSync(path.dirname(filename), { recursive: true });
-    fs.writeFileSync(filename, zlib.gzipSync(JSON.stringify(dump[key])));
+    // fs.mkdirSync(path.dirname(filename), { recursive: true });
+    // fs.writeFileSync(filename, zlib.gzipSync(JSON.stringify(dump[key])));
     console.log(`Written ${filename}`);
   }
 

@@ -3,7 +3,7 @@ const pm2 = require("pm2");
 
 console.log("Before job instantiation");
 const job = new CronJob(
-  "0 */5 * * * *",
+  "0 */1 * * * *",
   function () {
     const d = new Date();
     console.log("Running script:", d);
